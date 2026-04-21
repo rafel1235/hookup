@@ -1,0 +1,107 @@
+// 1. IDENTITÀ CENTRALE (Privata e Sicura)
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String
+  
+  // Compliance & Sicurezza
+  kycVerified   Boolean  @default(false)
+  kycToken      String?  // Qui salveremo l'ID del provider esterno in futuro
+
+  // Relazione 1-a-1 con il profilo pubblico
+  profile       Profile?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// 2. PROFILO PUBBLICO (La Base per tutti)
+model Profile {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  username      String   @unique
+  displayName   String
+  bio           String?
+  avatarUrl     String?  // Link all'immagine su AWS S3
+
+  // Moduli di estensione (attivati a scelta dall'utente)
+  creatorData   CreatorProfile?
+  proData       ProfessionalProfile?
+
+  // Social & Contenuti (MVP)
+  posts         Post[]
+  jobAds        JobAd[]
+  followers     Follow[] @relation("following")
+  following     Follow[] @relation("follower")
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// 3. ESTENSIONE CREATOR (Attivata solo se l'utente vuole monetizzare)
+model CreatorProfile {
+  id            String   @id @default(uuid())
+  profileId     String   @unique
+  profile       Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  isVerified    Boolean  @default(false) // Il famoso Badge Spunta Blu
+  categories    String[] // Array, es: ["BDSM", "Vanilla", "Fetish"]
+
+  // Qui in V2 aggiungeremo i campi per i pagamenti e abbonamenti
+}
+
+// 4. ESTENSIONE PROFESSIONISTA (Il "CV Adult")
+model ProfessionalProfile {
+  id            String   @id @default(uuid())
+  profileId     String   @unique
+  profile       Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  role          String   // es: "Videomaker", "Fotografo", "Editor"
+  skills        String[] // Array, es: ["Premiere Pro", "Color Grading", "Lighting"]
+  portfolioUrl  String?
+  isAvailable   Boolean  @default(true) // Badge "Disponibile per lavoro"
+}
+
+// 5. POST FEED (Il contenuto)
+model Post {
+  id            String   @id @default(uuid())
+  profileId     String
+  profile       Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  content       String?
+  mediaUrls     String[] // Array di link a S3 (foto/video)
+  isPremium     Boolean  @default(false) // Pronti per la V2 del paywall
+
+  createdAt     DateTime @default(now())
+}
+
+// 6. ANNUNCI LAVORO (Il Networking B2B - Feature Chiave)
+model JobAd {
+  id            String   @id @default(uuid())
+  profileId     String
+  profile       Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  title         String
+  description   String
+  location      String?  // Può essere "Roma", "Milano", o "Remote"
+  budget        String?  // Libero, es: "Retribuito", "Collab TFP", "Da concordare"
+  isActive      Boolean  @default(true)
+
+  createdAt     DateTime @default(now())
+}
+
+// 7. SISTEMA DI FOLLOW (Rete Sociale)
+model Follow {
+  followerId    String
+  followingId   String
+
+  follower      Profile  @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following     Profile  @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime @default(now())
+
+  // Chiave primaria composta: impedisce allo stesso utente di seguire due volte la stessa persona
+  @@id([followerId, followingId]) 
+}
