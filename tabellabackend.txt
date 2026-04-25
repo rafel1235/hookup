@@ -1,0 +1,4 @@
+Alta	Validation Pipes
+Media	Premium Toggle
+Media	Modulo JobAds
+Bassa	Modulo Follow
