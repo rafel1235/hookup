@@ -1,35 +1,19 @@
-import { Controller, Body, Patch, Param, Post } from '@nestjs/common';
+import { Controller, Body, Patch, UseGuards, Request } from '@nestjs/common';
 import { ProfileService } from './profile.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // Importa il Guard
 
 @Controller('profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
-  @Patch(':userId/update')
-  async updateProfile(
-    @Param('userId') userId: string,
+  @UseGuards(JwtAuthGuard) // Protegge questa rotta
+  @Patch('update-me') // Nota: non c'è più :userId nell'URL!
+  async updateMyProfile(
+    @Request() req, // Otteniamo i dati dell'utente dal token JWT
     @Body() body: { bio?: string; avatarUrl?: string },
   ) {
-    return this.profileService.updateBaseProfile(userId, body);
-  }
-
-  @Post(':userId/become-creator')
-  async becomeCreator(
-    @Param('userId') userId: string,
-    @Body() body: { categories: string[] },
-  ) {
-    return this.profileService.activateCreatorProfile(userId, body.categories);
-  }
-
-  @Post(':userId/become-pro')
-  async becomePro(
-    @Param('userId') userId: string,
-    @Body() body: { role: string; skills: string[] },
-  ) {
-    return this.profileService.activateProProfile(
-      userId,
-      body.role,
-      body.skills,
-    );
+    // req.user.userId contiene l'ID sicuro estratto dal token
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+    return this.profileService.updateBaseProfile(req.user.userId, body);
   }
 }

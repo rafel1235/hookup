@@ -1,20 +1,20 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { PostService } from './post.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // Importiamo il guard
 
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  // Crea un post: POST http://localhost:3000/posts/:userId
-  @Post(':userId')
-  async create(
-    @Param('userId') userId: string,
-    @Body() body: { title: string; content?: string },
-  ) {
-    return this.postService.createPost(userId, body);
+  // 1. CREA POST (ORA PROTETTO!)
+  @UseGuards(JwtAuthGuard)
+  @Post('create') // Abbiamo tolto :userId dall'URL!
+  async create(@Request() req, @Body() body: { content?: string; mediaUrls?: string[] }) {
+    // Usiamo req.user.userId che arriva dal token sicuro
+    return this.postService.createPost(req.user.userId, body);
   }
 
-  // Leggi tutti i post: GET http://localhost:3000/posts
+  // 2. FEED PUBBLICO (Resta aperto, tutti possono leggerlo)
   @Get()
   async findAll() {
     return this.postService.findAll();

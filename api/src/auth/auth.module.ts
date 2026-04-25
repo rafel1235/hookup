@@ -1,16 +1,20 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './jwt.strategy'; // Importa la nuova strategia
 
 @Module({
   imports: [
+    PassportModule, // Fondamentale per far funzionare i Guard
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'una-stringa-super-segreta', 
+      secret: process.env.JWT_SECRET || 'una-stringa-super-segreta',
       signOptions: { expiresIn: '7d' },
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy], // Aggiungi JwtStrategy qui!
+  exports: [AuthService],
 })
 export class AuthModule {}

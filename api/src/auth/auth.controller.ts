@@ -1,17 +1,12 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
-@Controller('auth')
+@Controller('auth') // Questo definisce il prefisso /auth
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
-  @Post('register')
-  async register(@Body() body: any) {
-    return this.authService.register(
-      body.email, 
-      body.password, 
-      body.username, 
-      body.displayName
-    );
+  @Post('login') // Questo definisce la rotta /login
+  async login(@Body() body: any) {
+    return this.authService.login(body.email, body.password);
   }
 }

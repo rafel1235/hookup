@@ -6,7 +6,11 @@ import { ProfileModule } from './profile/profile.module';
 import { PostModule } from './post/post.module';
 
 @Module({
-  imports: [AuthModule, ProfileModule, PostModule],
+  imports: [
+    AuthModule, // Deve essere qui!
+    ProfileModule,
+    PostModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
