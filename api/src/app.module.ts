@@ -4,12 +4,14 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profile/profile.module';
 import { PostModule } from './post/post.module';
+import { JobAdModule } from './job-ad/job-ad.module';
 
 @Module({
   imports: [
     AuthModule, // Deve essere qui!
     ProfileModule,
     PostModule,
+    JobAdModule,
   ],
   controllers: [AppController],
   providers: [AppService],
