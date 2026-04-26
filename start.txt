@@ -1,0 +1,3 @@
+web = npm run dev
+api = npm run start:dev
+prisma = npx prisma studio
