@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
 export default function JobsPage() {
   const [jobs, setJobs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +23,7 @@ export default function JobsPage() {
   const fetchJobs = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/job-ads');
+      const response = await fetch(`${API_URL}/job-ads`);
       const data = await response.json();
       setJobs(data);
     } catch (error) {
@@ -47,7 +49,7 @@ export default function JobsPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/job-ads', {
+      const response = await fetch(`${API_URL}/job-ads`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

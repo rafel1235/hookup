@@ -3,6 +3,8 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
 export default function PublicProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params); // Otteniamo l'ID dall'indirizzo URL
   const [profile, setProfile] = useState<any>(null);
@@ -11,7 +13,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ id: st
 
   useEffect(() => {
     // 1. Carica i dati del profilo
-    fetch(`http://localhost:3000/profile/${id}`)
+    fetch(`${API_URL}/profile/${id}`)
       .then(res => res.json())
       .then(data => setProfile(data));
   }, [id]);
@@ -20,7 +22,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ id: st
     const token = localStorage.getItem('token');
     if (!token) return router.push('/login');
 
-    const response = await fetch(`http://localhost:3000/follow/${id}`, {
+    const response = await fetch(`${API_URL}/follow/${id}`, {
       method: isFollowing ? 'DELETE' : 'POST',
       headers: { 'Authorization': `Bearer ${token}` }
     });

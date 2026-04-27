@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
 export default function ProfilePage() {
   const [bio, setBio] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
@@ -66,7 +68,7 @@ export default function ProfilePage() {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/profile/update-me', {
+      const response = await fetch(`${API_URL}/profile/update-me`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

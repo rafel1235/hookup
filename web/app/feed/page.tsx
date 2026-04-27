@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
 export default function FeedPage() {
   const [posts, setPosts] = useState<any[]>([]);
   const [content, setContent] = useState('');
@@ -21,7 +23,8 @@ export default function FeedPage() {
   const fetchPosts = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/posts');
+      const response = await fetch(`${API_URL}/posts`);
+
       const data = await response.json();
       setPosts(data);
     } catch (error) {
@@ -68,7 +71,7 @@ export default function FeedPage() {
     if (!token) return router.push('/login');
 
     try {
-      const response = await fetch('http://localhost:3000/posts/create', {
+      const response = await fetch(`${API_URL}/posts/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
